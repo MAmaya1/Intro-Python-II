@@ -1,5 +1,6 @@
 from room import Room
 from player import Player
+from item import Item
 
 # Declare all the rooms
 
@@ -37,42 +38,80 @@ room['treasure'].s_to = room['narrow']
 # Main
 #
 
+# Create Items
+
+broadsword = Item('Broadsword', 'A standard broadsword, forged in steel')
+axe = Item('Axe', 'A standard tree-felling axe.')
+pitchfork = Item('Pitchfork', 'A standard pitchfork, engraved "Farmer Joe"')
+
+# Item dictionary
+
+items = {
+    ''
+}
+
+# Add items to rooms
+
+room['foyer'].items.extend([broadsword, axe, pitchfork])
+
 # Make a new player object that is currently in the 'outside' room.
 
 new_player = Player('Mario', room['outside'], None)
-print(f'Welcome, {new_player.name}!')
-
-# # Write a loop that:
-# #
-# # * Prints the current room name
-# # * Prints the current description (the textwrap module might be useful here).
-# # * Waits for user input and decides what to do.
 
 valid_directions = ['n', 's', 'e', 'w']
 
+# # Write a loop that:
 while True:
-    print('\n----------------------------------------------')
-    print(f'\nCurrent location: {new_player.current_room.name}')
-    print(new_player.current_room.description)
-    print(f'\nWhich direction would you like to go?')
 
-    # User input
+# # * Prints the current room name
+# # * Prints the current description (the textwrap module might be useful here).
+    # ^^printing of name and desctiption abstracted to Room class
 
-    direction = input('[n] North [s] South [e] East [w] West    [q] Quit\n')
+# # * Waits for user input and decides what to do.
+    direction = input('Which direction would you like to go?\n [n] North [s] South [e] East [w] West    [q] Quit\n')
 
-    if direction in valid_directions:
-        new_player.move(direction)
-    
-    elif direction is 'q':
-        print('Goodbye!')
-        break
-    
+    if len(direction) == 1:
+
+    # # If the user enters a cardinal direction, attempt to move to the room there.
+        if direction in valid_directions:
+            new_player.move(direction)
+
+    # # If the user enters "q", quit the game.
+        elif direction is 'q':
+            print('Goodbye!')
+            break
+
+    # Print player inventory
+        elif direction is 'i':
+            new_player.print_inventory()
+
+        else:
+            print('That is an invalid direction.')
+
     else:
-        print('I do not understand that command.')
+        verb = ' '.join(direction.split(' ')[0:1])
+        item = direction.split(' ')[-1]
+        noun = item.capitalize()
 
+    # Item dictionary
 
-# #
-# # If the user enters a cardinal direction, attempt to move to the room there.
-# # Print an error message if the movement isn't allowed.
-# #
-# # If the user enters "q", quit the game.
+        items = {
+            'broadsword': broadsword,
+            'axe': axe,
+            'pitchfork': pitchfork
+        }
+    
+    # Pick up items
+        if verb == 'get':
+            if [item.name == {noun} for item in new_player.current_room.items]:
+                new_player.get_item(items[item])
+            else:
+                print(f'There is no {noun} here!')
+
+    # Drop items
+        elif verb == 'drop':
+            new_player.drop_item(items[item])
+
+    # # Print an error message if the movement isn't allowed.
+        else:
+            print('I do not understand this command')
